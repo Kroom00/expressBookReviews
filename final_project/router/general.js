@@ -4,6 +4,10 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+// Function to check if a username already exists
+const doesExist = (username) => {
+  return users.some(user => user.username === username);
+};
 
 public_users.post("/register", (req,res) => {
   //Write your code here
@@ -12,12 +16,12 @@ public_users.post("/register", (req,res) => {
   if (username && password) {
     if (!doesExist(username)) {
       users.push({"username":username,"password":password});
-      return res.status(200).json({message: "User successfully registred. Now you can login"});
+      return res.status(200).json({message: "User successfully registered. Now you can login"});
     } else {
-      return res.status(404).json({message: "User already exists!"});
+      return res.status(409).json({message: "User already exists!"}); // Conflict status code for user already exists
     }
   }
-  return res.status(404).json({message: "Unable to register user."});
+  return res.status(400).json({message: "Unable to register user. Username or password missing."}); // Bad request status code for missing username or password
 });
 
 
@@ -28,10 +32,9 @@ public_users.get('/',function (req, res) {
   });
   
 
-// Get book details based on ISBN
-public_users.get('/isbn/:isbn', function (req, res) {
-    const book_isbn = books.filter((book) => book.isbn === req.params.isbn);
-    if (book_isbn.length > 0) {
+  public_users.get('/isbn/:isbn', function (req, res) {
+    const book_isbn = books.find((book) => book.isbn === req.params.isbn);
+    if (book_isbn) {
         res.status(200).json(book_isbn);
     } else {
         res.status(404).json({ message: "Book not found" });
