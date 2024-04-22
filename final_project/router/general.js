@@ -33,10 +33,10 @@ public_users.get('/',function (req, res) {
   });
   
 
-  public_users.get('/isbn/:isbn', function (req, res) {
-    const book_isbn = books.find((book) => book.isbn === req.params.isbn);
-    if (book_isbn) {
-        res.status(200).json(book_isbn);
+public_users.get('/isbn/:isbn', function (req, res) {
+    const book = books[req.params.isbn];
+    if (book) {
+        res.status(200).json(book);
     } else {
         res.status(404).json({ message: "Book not found" });
     }
